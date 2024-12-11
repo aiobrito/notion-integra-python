@@ -2,7 +2,7 @@
 import sys
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any, Tuple
+from typing import Any, Tuple
 from src.core.notion_operations import NotionOperations
 # from src.config.settings import Settings
 
