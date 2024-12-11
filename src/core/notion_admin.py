@@ -2,6 +2,8 @@
 from typing import Dict, List, Any, Optional
 from .notion_client import NotionClient
 from ..config.settings import Settings
+from .validators import InputValidator
+from .rate_limiter import rate_limit
 
 class NotionDatabaseAdmin:
     """
@@ -12,6 +14,10 @@ class NotionDatabaseAdmin:
     def __init__(self):
         self.client = NotionClient()
         self.database_id = Settings.NOTION_DATABASE_ID
+    
+    @rate_limit(calls=5, period=60)
+    def validate_tag(self, new_tag: str) -> Dict[str, Any]:
+        InputValidator.validate_tag(new_tag)
     
     def get_database_schema(self) -> Dict[str, Any]:
         """Recupera e analisa schema atual do database"""
@@ -42,7 +48,8 @@ class NotionDatabaseAdmin:
             }
         except Exception as e:
             raise Exception(f"Erro ao recuperar opções: {str(e)}")
-
+    
+    @rate_limit(calls=10, period=60)
     def validate_tag(self, new_tag: str) -> Dict[str, Any]:
         """
         Valida tag contra existentes e sugere similares
