@@ -28,6 +28,71 @@ class NotionDatabaseAdmin:
         except Exception as e:
             raise Exception(f"Erro ao recuperar schema: {str(e)}")
     
+    def get_multiselect_options(self) -> Dict[str, Any]:
+        """Recupera configuração atual do Multi-select"""
+        try:
+            schema = self.get_database_schema()
+            multi_select = schema['properties'].get('Multi-select', {})
+            options = multi_select.get('multi_select', {}).get('options', [])
+            
+            return {
+                "total": len(options),
+                "options": [opt['name'] for opt in options],
+                "raw_config": multi_select
+            }
+        except Exception as e:
+            raise Exception(f"Erro ao recuperar opções: {str(e)}")
+
+    def validate_tag(self, new_tag: str) -> Dict[str, Any]:
+        """
+        Valida tag contra existentes e sugere similares
+        Args:
+            new_tag: Tag proposta para inserção
+        Returns:
+            Dict com status de validação e sugestões
+        """
+        try:
+            options = self.get_multiselect_options()
+            existing = [tag.lower() for tag in options['options']]
+            new_tag_lower = new_tag.lower()
+            
+            similar = [
+                tag for tag in options['options']
+                if (new_tag_lower in tag.lower() or 
+                    tag.lower() in new_tag_lower)
+            ]
+            
+            return {
+                "tag": new_tag,
+                "exists": new_tag_lower in existing,
+                "similar_count": len(similar),
+                "suggestions": similar
+            }
+        except Exception as e:
+            raise Exception(f"Erro na validação: {str(e)}")
+
+    def suggest_tags(self, partial: str) -> List[str]:
+        """
+        Sugere tags baseado em texto parcial
+        Args:
+            partial: Texto para busca
+        Returns:
+            Lista de tags sugeridas
+        """
+        try:
+            if len(partial) < 2:
+                return []
+                
+            options = self.get_multiselect_options()
+            partial_lower = partial.lower()
+            
+            return [
+                tag for tag in options['options']
+                if partial_lower in tag.lower()
+            ]
+        except Exception as e:
+            raise Exception(f"Erro na sugestão: {str(e)}")
+    
     def rename_property(self, old_name: str, new_name: str) -> Dict[str, Any]:
         """
         Renomeia propriedade mantendo configurações
