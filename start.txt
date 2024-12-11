@@ -1,0 +1,8 @@
+# 1. Ativar ambiente virtual
+.\venv\Scripts\activate
+
+# 2. Validar ativação
+python -c "import sys; print(sys.prefix)"
+
+# 3. Confirmar dependências
+pip list
