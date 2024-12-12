@@ -1,19 +1,47 @@
-# src/tests/test_admin.py - Nova Implementação
+# src/tests/test_admin.py
 from src.core.notion_admin import NotionDatabaseAdmin
 
-def test_admin_operations():
-    """Validação do schema atual do database"""
+def test_connection():
+    """Teste base já implementado e funcionando"""
     admin = NotionDatabaseAdmin()
-    
-    print("\n=== Schema Analysis ===")
-    schema = admin.get_database_schema()
-    print(f"Database: {schema['title']}")
-    print("\nCurrent Structure:")
-    for prop_name, details in schema['properties'].items():
-        print(f"▸ {prop_name:<15} | Type: {details['type']}")
-    
+    print("\n=== Validação de Conectividade ===")
+    status = admin.validate_connection()
+    print(f"✓ Conectado ao database: {status['database']['title']}")
+    print(f"✓ ID: {status['database']['id']}")
     return True
 
+def test_keywords_snapshot():
+    """Validação estrutural de keywords"""
+    admin = NotionDatabaseAdmin()
+    
+    print("\n=== Análise Estrutural de Keywords ===")
+    try:
+        snapshot = admin.get_keywords_snapshot()
+        
+        print("\nBase de Dados:")
+        print(f"▸ Total de Páginas: {snapshot['total_pages']}")
+        
+        print("\nDistribuição de Keywords:")
+        for kw, count in sorted(snapshot['keywords'].items(), 
+                              key=lambda x: x[1], reverse=True):
+            print(f"▸ {kw}: {count} {'uso' if count == 1 else 'usos'}")
+        
+        if snapshot['timestamps']['first_seen']:
+            print("\nLinha do Tempo:")
+            print(f"▸ Primeiro Registro: {snapshot['timestamps']['first_seen']}")
+            print(f"▸ Última Atualização: {snapshot['timestamps']['last_seen']}")
+            
+        return True
+        
+    except Exception as e:
+        print(f"✗ Erro: {str(e)}")
+        return False
+def main():
+    """Função principal de execução"""
+    connection = test_connection()
+    content = test_keywords_snapshot()
+    print(f"\nStatus Final: {'✓ Sucesso' if all([connection, content]) else '✗ Falha'}")
+    
 if __name__ == "__main__":
-    status = test_admin_operations()
-    print(f"\nValidation Status: {'✓ Success' if status else '✗ Failed'}")
+    success = test_keywords_snapshot()
+    print(f"\nStatus: {'✓ Sucesso' if success else '✗ Falha'}")
