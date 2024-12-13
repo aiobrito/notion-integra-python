@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\docs",
+    "\\docs\\api",
+    "\\docs\\postman",
+    "\\docs\\setup",
+    "\\src",
+    "\\src\\core",
+    "\\src\\tests",
+    "\\tests",
+    "\\tests\\.pytest_cache"
+  ],
+  "SelectedNode": "\\tests\\test_notion_admin.py",
+  "PreviewInSolutionExplorer": false
+}
